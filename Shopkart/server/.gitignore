@@ -1,0 +1,8 @@
+# MongoDB / local database
+server/mongo/
+**/WiredTiger*
+**/*.lock
+
+# Node
+node_modules/
+.env

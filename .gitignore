@@ -1,0 +1,7 @@
+Shopkart/server/mongo/
+node_modules/
+.env
+*.exe
+*.zip
+*.pdb
+*.lock
