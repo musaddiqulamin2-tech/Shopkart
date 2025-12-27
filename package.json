@@ -1,0 +1,14 @@
+{
+  "name": "shopkart",
+  "version": "1.0.0",
+  "description": "Shopkart E-commerce Full Stack Application",
+  "scripts": {
+    "install-server": "cd Shopkart/server && npm install",
+    "install-client": "cd Shopkart/client && npm install",
+    "install-all": "npm run install-server && npm run install-client"
+  },
+  "engines": {
+    "node": ">=14.x"
+  }
+}
+

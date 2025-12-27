@@ -8,26 +8,33 @@ require('dotenv').config();
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:5000'],
+  credentials: true
+}));
 
-// Serve client build and public assets (if present) - FIRST before API routes
+// Serve client build and public assets (if present) - ONLY in local development
+// On Vercel, static files are served separately
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL_ENV;
 const fs = require('fs');
 const buildPath = path.join(__dirname, '..', 'client', 'build');
 const publicPath = path.join(__dirname, '..', 'client', 'public');
 
-// Serve static files from the React app build
-if (fs.existsSync(buildPath)) {
-  app.use(express.static(buildPath));
-}
-
-// Serve the banner image directly from client/public
-app.get('/Shopkart Official.png', (req, res) => {
-  const imgPath = path.join(publicPath, 'Shopkart Official.png');
-  if (fs.existsSync(imgPath)) {
-    return res.sendFile(imgPath);
+if (!isVercel) {
+  // Serve static files from the React app build (local only)
+  if (fs.existsSync(buildPath)) {
+    app.use(express.static(buildPath));
   }
-  res.status(404).send('Image not found');
-});
+
+  // Serve the banner image directly from client/public (local only)
+  app.get('/Shopkart Official.png', (req, res) => {
+    const imgPath = path.join(publicPath, 'Shopkart Official.png');
+    if (fs.existsSync(imgPath)) {
+      return res.sendFile(imgPath);
+    }
+    res.status(404).send('Image not found');
+  });
+}
 
 
 const mongoose = require('mongoose');
@@ -523,13 +530,22 @@ app.get('/api/health', (req, res) => {
 });
 
 // Catch-all: Serve React app's index.html for any other route (SPA fallback)
-app.get('*', (req, res) => {
-  const indexPath = path.join(buildPath, 'index.html');
-  if (fs.existsSync(indexPath)) {
-    return res.sendFile(indexPath);
-  }
-  res.status(404).send('Not found');
-});
+// Only in local development - Vercel handles this via vercel.json routes
+if (!isVercel) {
+  app.get('*', (req, res) => {
+    const indexPath = path.join(buildPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    res.status(404).send('Not found');
+  });
+}
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// Export app for Vercel serverless functions
+module.exports = app;
+
+// Only listen if not in Vercel environment
+if (process.env.VERCEL !== '1' && !process.env.VERCEL_ENV) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+}

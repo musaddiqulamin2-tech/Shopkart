@@ -51,7 +51,7 @@ import OrderConfirmationTemplate from './components/OrderConfirmationTemplate';
 import ModernOrderConfirmation from './components/ModernOrderConfirmation';
 import LoadingAnimation from './components/LoadingAnimation';
 import Banner from './components/Banner';
-import axios from 'axios';
+import api from './api';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('login');
@@ -72,9 +72,7 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      axios.get('http://localhost:5000/api/auth/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      api.get('/api/auth/profile')
         .then(res => {
           setUser(res.data.user);
           setCurrentPage('home');
@@ -95,7 +93,7 @@ function App() {
       const sessionId = params.get('session_id');
       const token = localStorage.getItem('token');
       // call backend to convert session into an order
-      axios.post('http://localhost:5000/api/checkout-success', { sessionId }, { headers: { Authorization: `Bearer ${token}` } })
+      api.post('/api/checkout-success', { sessionId })
         .then(res => {
           alert('✅ Payment successful and order created');
           setCart([]);
@@ -111,7 +109,7 @@ function App() {
   }, []);
 
   const fetchProducts = () => {
-    axios.get('http://localhost:5000/api/products')
+    api.get('/api/products')
       .then(res => setProducts(res.data))
       .catch(err => console.error("Error:", err));
   };
@@ -142,7 +140,7 @@ function App() {
     }
 
     setLoading(true);
-    axios.post('http://localhost:5000/api/auth/signup', { name, email, password })
+    api.post('/api/auth/signup', { name, email, password })
       .then(res => {
         alert("✅ Signup successful! Please log in.");
         localStorage.setItem('token', res.data.token);
@@ -165,7 +163,7 @@ function App() {
     setShowLoadingAnimation(true);
     setLoadingAnimationType('login-success');
     
-    axios.post('http://localhost:5000/api/auth/login', { email, password })
+    api.post('/api/auth/login', { email, password })
       .then(res => {
         localStorage.setItem('token', res.data.token);
         setUser(res.data.user);
@@ -247,9 +245,7 @@ function App() {
 
     setLoading(true);
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:5000/api/products', form, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+    api.post('/api/products', form)
       .then(() => {
         alert("✅ Product Added!");
         setForm({ name: '', price: '', image: '', category: '', stock: '' });
@@ -284,7 +280,7 @@ function App() {
     setLoadingMessage(`Order ID: #${Math.floor(Math.random() * 900000) + 100000}`);
     
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:5000/api/orders', { items, total: cartTotal, shipping }, { headers: { Authorization: `Bearer ${token}` } })
+    api.post('/api/orders', { items, total: cartTotal, shipping })
       .then(res => {
         setTimeout(() => {
           setShowLoadingAnimation(false);
@@ -304,14 +300,14 @@ function App() {
   const fetchOrders = () => {
     const token = localStorage.getItem('token');
     if (!token) return;
-    axios.get('http://localhost:5000/api/orders', { headers: { Authorization: `Bearer ${token}` } })
+    api.get('/api/orders')
       .then(res => setOrders(res.data))
       .catch(err => console.error('Orders fetch error', err.message));
   };
 
   const updateOrderStatus = (id, status) => {
     const token = localStorage.getItem('token');
-    axios.put(`http://localhost:5000/api/orders/${id}`, { status }, { headers: { Authorization: `Bearer ${token}` } })
+    api.put(`/api/orders/${id}`, { status })
       .then(() => fetchOrders())
       .catch(err => alert('❌ Error: ' + (err.response?.data?.error || err.message)));
   };
@@ -319,7 +315,7 @@ function App() {
   const handleDeleteOrder = (id) => {
     if (!window.confirm('Delete this order?')) return;
     const token = localStorage.getItem('token');
-    axios.delete(`http://localhost:5000/api/orders/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+    api.delete(`/api/orders/${id}`)
       .then(() => fetchOrders())
       .catch(err => alert('❌ Error: ' + (err.response?.data?.error || err.message)));
   };
@@ -328,9 +324,7 @@ function App() {
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       const token = localStorage.getItem('token');
-      axios.delete(`http://localhost:5000/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      api.delete(`/api/products/${id}`)
         .then(() => {
           alert("✅ Deleted!");
           fetchProducts();
@@ -917,7 +911,7 @@ function App() {
                     setOrderLoading(true);
                     const items = cart.map(i => ({ productId: i._id, name: i.name, price: i.price, quantity: i.quantity }));
                     const token = localStorage.getItem('token');
-                    axios.post('http://localhost:5000/api/orders', { items, total: cartTotal, shipping, paymentMethod }, { headers: { Authorization: `Bearer ${token}` } })
+                    api.post('/api/orders', { items, total: cartTotal, shipping, paymentMethod })
                       .then(res => {
                         setCart([]);
                         localStorage.removeItem('cart');
