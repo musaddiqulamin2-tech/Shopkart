@@ -22,14 +22,32 @@
       "dest": "/api/index.js"
     },
     {
-      "src": "/(.*\\.(js|css|ico|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot))",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
+      "src": "/static/(.*)",
+      "dest": "/Shopkart/client/build/static/$1"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/Shopkart/client/build/favicon.ico"
+    },
+    {
+      "src": "/asset-manifest.json",
+      "dest": "/Shopkart/client/build/asset-manifest.json"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/Shopkart/client/build/manifest.json"
+    },
+    {
+      "src": "/logo192.png",
+      "dest": "/Shopkart/client/build/logo192.png"
+    },
+    {
+      "src": "/logo512.png",
+      "dest": "/Shopkart/client/build/logo512.png"
     },
     {
       "src": "/(.*)",
-      "dest": "/Shopkart/client/$1"
+      "dest": "/Shopkart/client/build/index.html"
     }
   ],
   "env": {

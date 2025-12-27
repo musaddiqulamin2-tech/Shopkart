@@ -3,7 +3,18 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+
+// Load environment variables from .env if present
 require('dotenv').config();
+
+// Fallback dummy values for demo/testing
+const DUMMY_MONGO_URI = 'mongodb://localhost:27017/shopkart-demo';
+const DUMMY_JWT_SECRET = 'dummy_jwt_secret';
+const DUMMY_STRIPE_SECRET_KEY = 'sk_test_dummy';
+
+process.env.MONGO_URI = process.env.MONGO_URI || DUMMY_MONGO_URI;
+process.env.JWT_SECRET = process.env.JWT_SECRET || DUMMY_JWT_SECRET;
+process.env.STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY || DUMMY_STRIPE_SECRET_KEY;
 
 const app = express();
 
